@@ -1,0 +1,20 @@
+FROM public.ecr.aws/amazonlinux/amazonlinux@sha256:81113fc89f9a0b2a754f6e1bf09f79ce56ea8341a849f72605a94104031276d0 AS build
+COPY src src
+COPY pom-java8.xml pom.xml
+RUN yum update -y && yum clean all
+RUN amazon-linux-extras enable corretto8
+RUN yum install java-1.8.0-amazon-corretto-devel -y && yum clean all
+RUN yum install maven -y && yum clean all
+RUN mvn package -Dmaven.compiler.release=8 -f pom.xml
+
+FROM public.ecr.aws/amazonlinux/amazonlinux@sha256:81113fc89f9a0b2a754f6e1bf09f79ce56ea8341a849f72605a94104031276d0
+COPY --from=build target/web-bookshop-4.1.2-fat.jar target/web-bookshop-4.1.2-fat.jar
+RUN yum update -y && yum clean all
+RUN amazon-linux-extras enable corretto8
+RUN yum install java-1.8.0-amazon-corretto -y && yum clean all
+
+CMD ["java", "-XX:+PerfDisableSharedMem", "-XX:+UseG1GC", "-jar", "target/web-bookshop-4.1.2-fat.jar"]
+
+HEALTHCHECK NONE
+USER nobody
+EXPOSE 8080

@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: image-builder
+  namespace: perf-test
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sut-builder-java11
+  namespace: perf-test
+spec:
+  containers:
+  - name: kaniko
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      seccompProfile:
+        type: RuntimeDefault
+    imagePullPolicy: Always
+    image: gcr.io/kaniko-project/executor@sha256:9e69fd4330ec887829c780f5126dd80edc663df6def362cd22e79bcdf00ac53f
+    args:
+      - "--context=$(SUT_SOURCE_URL)"
+      - "--destination=$(SUT_ECR_URL):4.1.2-corretto-11"
+      - "--dockerfile=Dockerfile.java11"
+      - "--verbosity=info"
+    env:
+    - name: AWS_SDK_LOAD_CONFIG
+      value: "true"
+    - name: AWS_EC2_METADATA_DISABLED
+      value: "true"
+    - name: SUT_SOURCE_URL
+      valueFrom:
+        configMapKeyRef:
+          name: sut-repo
+          key: source-url
+    - name: SUT_ECR_URL
+      valueFrom:
+        configMapKeyRef:
+          name: sut-repo
+          key: ecr-url
+    livenessProbe:
+      exec:
+        command:
+        - 'true'
+    readinessProbe:
+      exec:
+        command:
+        - 'true'
+    securityContext:
+      allowPrivilegeEscalation: false
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "1"
+      limits:
+        memory: "512Mi"
+        cpu: "2"
+  nodeSelector:
+    kubernetes.io/arch: arm64
+  restartPolicy: Never
+  serviceAccountName: image-builder
