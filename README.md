@@ -36,6 +36,10 @@ This folder contains the HTTP benchmarking tool.
 ## Prerequisites
 
 * Ensure you have the following tools installed: **aws, git, kubectl, terraform**
+* You have admininstrative access to the AWS account
+* A brand new VPC, subnet, EKS cluster, and ECR will be created (and terminated after completion)
+
+Please speak with your AWS administrator if your requirements are different to that.
 
 ## Getting started
 
