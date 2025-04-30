@@ -22,20 +22,16 @@ This folder contains the Terraform manifests to set up the necessary AWS resourc
 
 This folder contains all the relevant Kubernetes resources, including:
 
-* Karpenter node pool definition
+* [Karpenter node pool](https://karpenter.sh/docs/concepts/nodepools/) definition
 * Load testing server and client-side components
 
 ### `web-bookshop-app`
 
 This folder contains the RESTful web application that will be used as the target for the load tests.
 
-### `wrk`
-
-This folder contains the HTTP benchmarking tool.
-
 ## Prerequisites
 
-* Ensure you have the following tools installed: **aws, git, kubectl, terraform**
+* Ensure you have the following tools installed: **[aws](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html), [git](https://git-scm.com/downloads), [kubectl](https://kubernetes.io/docs/tasks/tools/), [terraform](https://developer.hashicorp.com/terraform/install)**
 * You have admininstrative access to the AWS account
 * A brand new VPC, subnet, EKS cluster, and ECR will be created (and terminated after completion)
 
@@ -47,7 +43,7 @@ Each test stack consists of foundational infrastructure (an EKS cluster provisio
 
 ### Provision foundational infrastructure
 
-* This step will create the necessary VPC, Subnets, Route Tables, EKS, ECR, Argo Workflows, and Amazon CloudWatch Observability resources.
+* This step will create the necessary Amazon Virtual Private Cloud ([VPC](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html)), Subnets, Route Tables, Amazon Elastic Container Service for Kubernetes ([EKS](https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html)), Amazon Elastic Container Registry ([ECR](https://docs.aws.amazon.com/AmazonECR/latest/userguide/what-is-ecr.html)), [Argo Workflows](https://github.com/argoproj/argo-workflows), and [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-EKS.html) on Amazon EKS resources.
 * Navigate to the `terraform-infra/` directory and run the following commands:
 
 ```
@@ -76,7 +72,7 @@ kubectl apply -f nodepool.yaml
 ### Build test containers
 
 * The test makes use of a sample application developed as part of the Graviton2 Workshop to demonstrate how to run a controlled experiment. Read the workshop documentation to learn more about [use case](https://catalog.workshops.aws/graviton/en-US/performance/introduction) and [test objective](https://catalog.workshops.aws/graviton/en-US/performance/test-objective).
-* Run the following commands to build the test backend (Java 8 and Java 11) and test application ([wrk2](https://github.com/giltene/wrk2)):
+* Run the following commands to build the test backend (Java 8 and Java 11) and test application which runs a HTTP benchmarking tool ([wrk2](https://github.com/giltene/wrk2)):
 
 ```
 kubectl apply -f build-sut.yaml
@@ -158,6 +154,7 @@ fields @timestamp, kubernetes.pod_name, log
 ```
 
 * Click **Run query** to inspect the output
+* The query will display the standard output of the [wrk2](https://github.com/giltene/wrk2) HTTP benchmark run
 
 ## Optional: troubleshoot & optimize application
 
