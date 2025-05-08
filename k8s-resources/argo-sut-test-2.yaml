@@ -23,8 +23,6 @@ spec:
                 key: ecr-url
           - name: tag
             value: '4.1.2-corretto-11'
-          - name: MinRAMPercentage
-            value: '60'
 
     - - name: wrk
         template: run-wrk
@@ -41,7 +39,6 @@ spec:
       parameters:
       - name: image
       - name: tag
-      - name: MinRAMPercentage
     nodeSelector:
       node.kubernetes.io/instance-type: m7g.xlarge
     container:
@@ -50,8 +47,6 @@ spec:
       args:
       - -XX:+PerfDisableSharedMem
       - -XX:+UseG1GC
-      - -XX:MinRAMPercentage={{inputs.parameters.MinRAMPercentage}}
-      - -XX:MaxRAMPercentage=80
       - -jar
       - target/web-bookshop-4.1.2-fat.jar
       resources:

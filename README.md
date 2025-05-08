@@ -57,7 +57,7 @@ terraform apply -auto-approve
 * Run the following command to update your kubectl config to work with the new EKS cluster:
 
 ```
-aws eks update-kubeconfig —name graviton-perf-lab
+aws eks update-kubeconfig --name graviton-perf-lab
 ```
 
 ### Create test nodes via Karpenter
@@ -75,9 +75,12 @@ kubectl apply -f nodepool.yaml
 * Run the following commands to build the test backend (Java 8 and Java 11) and test application which runs a HTTP benchmarking tool ([wrk2](https://github.com/giltene/wrk2)):
 
 ```
-kubectl apply -f build-sut.yaml
+kubectl apply -f build-sut-java8.yaml
+kubectl apply -f build-sut-java11.yaml
 
-kubectl get pods/sut-builder
+kubectl -n perf-test get pods/sut-builder-java8
+kubectl -n perf-test get pods/sut-builder-java11
+
 
 NAME READY STATUS RESTARTS AGE
 sut-builder 0/1 Completed 0 103s
@@ -88,7 +91,7 @@ sut-builder 0/1 Completed 0 103s
 * Confirm containers for the test backend and test client were published successfully to ECR:
 
 ```
-aws ecr list-images —repository-name=graviton-perf-lab/web-bookshop
+aws ecr list-images --repository-name=graviton-perf-lab/web-bookshop
 
 imageIds:
 - imageDigest: sha256:742b565bc523feb9c464fa5f421a587e21dabd6ac5a9ee1b3319899a81e97b4b
@@ -129,7 +132,7 @@ kubectl apply -f argo-sut-test-2.yaml
 * Delete all the Argo Workflows using the following command:
 
 ```
-kubectl delete workflows —all
+kubectl -n perf-test delete workflows --all
 ```
 
 ## Inspect test results

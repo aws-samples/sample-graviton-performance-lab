@@ -24,6 +24,7 @@ spec:
     image: gcr.io/kaniko-project/executor@sha256:9e69fd4330ec887829c780f5126dd80edc663df6def362cd22e79bcdf00ac53f
     args:
       - "--context=$(SUT_SOURCE_URL)"
+      - "--context-sub-path=web-bookshop-app"
       - "--destination=$(SUT_ECR_URL):4.1.2-corretto-8"
       - "--dockerfile=Dockerfile.java8"
       - "--verbosity=info"
@@ -54,11 +55,11 @@ spec:
       allowPrivilegeEscalation: false
     resources:
       requests:
-        memory: "256Mi"
-        cpu: "1"
-      limits:
-        memory: "512Mi"
+        memory: "2048Mi"
         cpu: "2"
+      limits:
+        memory: "2048Mi"
+        cpu: "4"
   nodeSelector:
     kubernetes.io/arch: arm64
   restartPolicy: Never
